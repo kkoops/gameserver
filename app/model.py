@@ -69,3 +69,13 @@ def update_user(token: str, name: str, leader_card_id: int) -> None:
             ),
             dict(token=token, name=name, leader_card_id=leader_card_id),
         )
+
+#room
+def create_room()->int:
+    with engine.begin() as conn:
+        result=conn.execute(
+            text(
+                "INSERT INTO `room` "
+            )
+        )
+    return room_id

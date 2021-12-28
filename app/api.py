@@ -65,3 +65,18 @@ def update(req: UserCreateRequest, token: str = Depends(get_auth_token)):
     # print(req)
     model.update_user(token, req.user_name, req.leader_card_id)
     return {}
+
+
+# room APIs
+class RoomCreateResponse(BaseModel):
+    room_id:int
+
+class RoomCreateRequest(BaseModel):
+    live_id:int
+    select_difficulty:LiveDifficulty
+
+
+@app.post("/room/create", response_model=RoomCreateResponse)
+def room_create(req: RoomCreateRequest):
+    """新規ルーム作成"""
+    return RoomCreateResponse()
