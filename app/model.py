@@ -141,3 +141,21 @@ def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult
             return 2
         else:
             return 4
+
+class RoomUser(BaseModel):
+    user_id: int
+    name: str
+    leader_card_id: int
+    select_difficulty: LiveDifficulty
+    is_me: bool
+    is_host: bool
+    class Config:
+        orm_mode=True
+
+class WaitRoomStatus(enum):
+    Waiting=1
+    LiveStart=2
+    Dissolution=3
+
+#def room_wait(room_id: int)->WaitRoomStatus,list[RoomUser]:
+ #   return 

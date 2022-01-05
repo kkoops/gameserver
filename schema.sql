@@ -15,3 +15,11 @@ CREATE TABLE `room` (
   `max_user_count` bigint NOT NULL DEFAULT 4,
   PRIMARY KEY(`room_id`)
 );
+DROP TABLE IF EXISTS `room_user`;
+CREATE TABLE `room_user`(
+  `room_id` bigint NOT NULL,
+  `user_id` bigint NOT NULL,
+  --difficulty?
+  `score` int,
+  PRIMARY KEY(`room_id`,`user_id`)
+)
