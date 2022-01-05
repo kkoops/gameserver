@@ -11,5 +11,7 @@ DROP TABLE IF EXISTS `room`;
 CREATE TABLE `room` (
   `room_id` bigint NOT NULL AUTO_INCREMENT,
   `live_id` bigint NOT NULL,
+  `joined_user_count` bigint NOT NULL DEFAULT 0,
+  `max_user_count` bigint NOT NULL DEFAULT 4,
   PRIMARY KEY(`room_id`)
 )

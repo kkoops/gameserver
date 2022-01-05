@@ -82,3 +82,18 @@ def room_create(req: RoomCreateRequest):
     """新規ルーム作成"""
     room_id = model.create_room(req.live_id, req.select_difficulty)
     return RoomCreateResponse(room_id=room_id)
+
+
+class RoomListResponse(BaseModel):
+    room_info_list: list[model.RoomInfo]
+
+
+class RoomListRequest(BaseModel):
+    live_id: int
+
+
+@app.post("/room/list", response_model=RoomListResponse)
+def room_list(req: RoomListRequest):
+    """ルームリスト表示"""
+    room_list_info = model.list_room(req.live_id)
+    return RoomListResponse(room_info_list=room_list_info)

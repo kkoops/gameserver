@@ -85,3 +85,28 @@ def create_room(live_id: int, select_difficulty: LiveDifficulty) -> int:
         )
         room_id = result.lastrowid
     return room_id
+
+
+class RoomInfo(BaseModel):
+    room_id: int
+    live_id: int
+    joined_user_count: int
+    max_user_count: int
+
+    class Config:
+        orm_mode = True
+
+
+def list_room(live_id: int) -> list[RoomInfo]:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text("SELECT * FROM `room` WHERE live_id=:live_id"), dict(live_id=live_id)
+        )
+        try:
+            rows = result.all()
+        except NoResultFound:
+            return None
+        room_list = []
+        for i in range(len(rows)):
+            room_list.append(RoomInfo.from_orm(rows[i]))
+        return room_list
