@@ -137,5 +137,7 @@ def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult
                 dict(room_id=room_id),
             )
             return 1
-        else:
+        elif row.max_user_count==row.joined_user_count:
             return 2
+        else:
+            return 4
