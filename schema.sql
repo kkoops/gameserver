@@ -7,3 +7,9 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `token` (`token`)
 );
+DROP TABLE IF EXISTS `room`;
+CREATE TABLE `room` (
+  `room_id` bigint NOT NULL AUTO_INCREMENT,
+  `live_id` bigint NOT NULL,
+  PRIMARY KEY(`room_id`)
+)

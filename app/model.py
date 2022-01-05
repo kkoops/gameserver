@@ -71,11 +71,17 @@ def update_user(token: str, name: str, leader_card_id: int) -> None:
         )
 
 #room
-def create_room()->int:
+class LiveDifficulty(Enum):
+    normal=1
+    hard=2
+
+def create_room(live_id:int,select_difficulty:LiveDifficulty)->int:
     with engine.begin() as conn:
         result=conn.execute(
             text(
-                "INSERT INTO `room` "
-            )
+                "INSERT INTO `room` (live_id) VALUES(:live_id)"
+            ),
+            dict(live_id=live_id,select_difficulty=select_difficulty)
         )
+        room_id=result.lastrowid
     return room_id

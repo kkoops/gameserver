@@ -69,14 +69,15 @@ def update(req: UserCreateRequest, token: str = Depends(get_auth_token)):
 
 # room APIs
 class RoomCreateResponse(BaseModel):
-    room_id:int
+    room_id: int
 
 class RoomCreateRequest(BaseModel):
-    live_id:int
-    select_difficulty:LiveDifficulty
+    live_id: int
+    select_difficulty: model.LiveDifficulty
 
 
 @app.post("/room/create", response_model=RoomCreateResponse)
 def room_create(req: RoomCreateRequest):
     """新規ルーム作成"""
-    return RoomCreateResponse()
+    room_id = model.create_room(req.live_id, req.select_difficulty)
+    return RoomCreateResponse(room_id=room_id)
