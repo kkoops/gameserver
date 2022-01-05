@@ -71,6 +71,7 @@ def update(req: UserCreateRequest, token: str = Depends(get_auth_token)):
 class RoomCreateResponse(BaseModel):
     room_id: int
 
+
 class RoomCreateRequest(BaseModel):
     live_id: int
     select_difficulty: model.LiveDifficulty
