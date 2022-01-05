@@ -110,3 +110,32 @@ def list_room(live_id: int) -> list[RoomInfo]:
         for i in range(len(rows)):
             room_list.append(RoomInfo.from_orm(rows[i]))
         return room_list
+
+
+class JoinRoomResult(Enum):
+    Ok = 1  # 入場Ok
+    RoomFull = 2  # 満員
+    Disbanded = 3  # 解散済み
+    OtherError = 4  # その他エラー
+
+
+def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text("SELECT * FROM `room` WHERE room_id=:room_id"), dict(room_id=room_id)
+        )
+        try:
+            row = result.one()
+        except NoResultFound:
+            return 3
+        row = RoomInfo.from_orm(row)
+        if row.max_user_count - row.joined_user_count >= 1:
+            uodate_result = conn.execute(
+                text(
+                    "UPDATE `room` SET  `joined_user_count`=`joined_user_count`+1 WHERE `room_id`=:room_id"
+                ),
+                dict(room_id=room_id),
+            )
+            return 1
+        else:
+            return 2
