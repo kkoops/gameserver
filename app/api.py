@@ -122,13 +122,15 @@ class RoomWaitRequest(BaseModel):
 
 
 class RoomWaitResponse(BaseModel):
-    status: WaitRoomStatus
+    status: model.WaitRoomStatus
     room_user_list: list[RoomUser]
 
 
 @app.post("/room/wait", response_model=RoomWaitResponse)
 def room_wait(req: RoomWaitRequest):
-    room_wait_result = model.room_wait(req.room_id)
+    #room_wait_result: RoomWaitResponse
+    status :int = model.room_wait_status(req.room_id)
+    room_user_list :list[RoomUser]= model.room_wait_user(req.room_id)
     return RoomWaitResponse(
-        status=room_wait_result.status, room_user_list=room_wait_result.room_user_list
+        status=status, room_user_list=room_user_list
     )

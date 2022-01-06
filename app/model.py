@@ -8,8 +8,6 @@ from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.exc import NoResultFound
 
-from app.api import RoomWaitResponse
-
 from .db import engine
 
 
@@ -177,22 +175,32 @@ class WaitRoomStatus(Enum):
     Dissolution = 3
 
 
-def room_wait(room_id: int) -> RoomWaitResponse:
-    room_wait_result: RoomWaitResponse
-    room_wait_result.response = 1
+def room_wait_status(room_id: int) -> WaitRoomStatus:
     with engine.begin() as conn:
-        result=conn.execute(
-            text("SELECT `user_id` FROM `room_user` WHERE room_id=:room_id"), dict(room_id=room_id)
+        result = conn.execute(
+            text("SELECT `status` FROM `room` WHERE room_id=:room_id"),
+            dict(room_id=room_id),
         )
         try:
-            rows = result.all()
+            room_wait_status = result.one()
         except NoResultFound:
-            room_wait_result.status=3
-            return room_wait_result
-        for user_id in rows:
-            search_result=conn.execute(
-                text("SELECT * FROM `user` WHERE user_id:=user_id"),dict(user_id=user_id)
-            )
-            room_wait_result.room_user_list.append(RoomUser.from_orm(search_result.one()))
+            return None
 
-    return room_wait_result
+    return room_wait_status
+
+
+def room_wait_user(room_id: int) -> list[RoomUser]:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text("SELECT `user_id` FROM `room_user` WHERE room_id=:room_id"),
+            dict(room_id=room_id),
+        )
+        list = []
+        id = result.all()
+        for row in id:
+            user_result = conn.execute(
+                text("SELECT * FROM `user` WHERE id=id"),
+                dict(id=id),
+            )
+            list.append(RoomUser.from_orm(user_result.one()))
+    return list
