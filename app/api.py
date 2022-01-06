@@ -130,5 +130,5 @@ class RoomWaitResponse(BaseModel):
 def room_wait(req: RoomWaitRequest):
     room_wait_result = model.room_wait(req.room_id)
     return RoomWaitResponse(
-        status=room_wait_result.status, room_user_list=room_wait_result.list[RoomUser]
+        status=room_wait_result.status, room_user_list=room_wait_result.room_user_list
     )

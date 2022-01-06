@@ -2,12 +2,13 @@ import json
 import uuid
 from enum import Enum, IntEnum
 from typing import Optional
-from app.api import RoomWaitResponse
 
 from fastapi import HTTPException
 from pydantic import BaseModel
 from sqlalchemy import text
 from sqlalchemy.exc import NoResultFound
+
+from app.api import RoomWaitResponse
 
 from .db import engine
 
@@ -176,17 +177,22 @@ class WaitRoomStatus(Enum):
     Dissolution = 3
 
 
- def room_wait(room_id: int)->RoomWaitResponse:
-     room_wait_result: RoomWaitResponse
-     room_wait_result.response=1
-     with engine.begin() as conn:
-        result = conn.execute(
-            text("SELECT * FROM `room` WHERE room_id=:room"), dict(room_id=room_id)
+def room_wait(room_id: int) -> RoomWaitResponse:
+    room_wait_result: RoomWaitResponse
+    room_wait_result.response = 1
+    with engine.begin() as conn:
+        result=conn.execute(
+            text("SELECT `user_id` FROM `room_user` WHERE room_id=:room_id"), dict(room_id=room_id)
         )
         try:
-            row = result.one()
+            rows = result.all()
         except NoResultFound:
             room_wait_result.status=3
             return room_wait_result
-        row.
-   return 
+        for user_id in rows:
+            search_result=conn.execute(
+                text("SELECT * FROM `user` WHERE user_id:=user_id"),dict(user_id=user_id)
+            )
+            room_wait_result.room_user_list.append(RoomUser.from_orm(search_result.one()))
+
+    return room_wait_result
