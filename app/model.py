@@ -88,7 +88,7 @@ def create_room(live_id: int, select_difficulty: LiveDifficulty, user: SafeUser)
             text(
                 "INSERT INTO `room_user` (`room_id`,`user_id`,`score`) VALUES(:room_id,:user_id,:score)"
             ),
-            dict(room_id=room_id, user_id=user.id,score=None),
+            dict(room_id=room_id, user_id=user.id, score=None),
         )
     return room_id
 
@@ -125,7 +125,9 @@ class JoinRoomResult(Enum):
     OtherError = 4  # その他エラー
 
 
-def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult:
+def join_room(
+    room_id: int, select_difficulty: LiveDifficulty, user: SafeUser
+) -> JoinRoomResult:
     with engine.begin() as conn:
         result = conn.execute(
             text("SELECT * FROM `room` WHERE room_id=:room_id"), dict(room_id=room_id)
@@ -136,11 +138,17 @@ def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult
             return 3
         row = RoomInfo.from_orm(row)
         if row.max_user_count - row.joined_user_count >= 1:
-            uodate_result = conn.execute(
+            update_result = conn.execute(
                 text(
                     "UPDATE `room` SET  `joined_user_count`=`joined_user_count`+1 WHERE `room_id`=:room_id"
                 ),
                 dict(room_id=room_id),
+            )
+            join_result = conn.execute(
+                text(
+                    "INSERT INTO `room_user` (`room_id`,`user_id`,`score`) VALUES(:room_id,:user_id,:score)"
+                ),
+                dict(room_id=room_id, user_id=user.id, score=None),
             )
             return 1
         elif row.max_user_count == row.joined_user_count:
