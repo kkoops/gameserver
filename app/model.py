@@ -77,13 +77,19 @@ class LiveDifficulty(Enum):
     hard = 2
 
 
-def create_room(live_id: int, select_difficulty: LiveDifficulty) -> int:
+def create_room(live_id: int, select_difficulty: LiveDifficulty, user: SafeUser) -> int:
     with engine.begin() as conn:
         result = conn.execute(
             text("INSERT INTO `room` (live_id) VALUES(:live_id)"),
             dict(live_id=live_id, select_difficulty=select_difficulty),
         )
         room_id = result.lastrowid
+        room_user_result = conn.execute(
+            text(
+                "INSERT INTO `room_user` (`room_id`,`user_id`,`score`) VALUES(:room_id,:user_id,:score)"
+            ),
+            dict(room_id=room_id, user_id=user.id,score=None),
+        )
     return room_id
 
 
@@ -137,10 +143,11 @@ def join_room(room_id: int, select_difficulty: LiveDifficulty) -> JoinRoomResult
                 dict(room_id=room_id),
             )
             return 1
-        elif row.max_user_count==row.joined_user_count:
+        elif row.max_user_count == row.joined_user_count:
             return 2
         else:
             return 4
+
 
 class RoomUser(BaseModel):
     user_id: int
@@ -149,13 +156,16 @@ class RoomUser(BaseModel):
     select_difficulty: LiveDifficulty
     is_me: bool
     is_host: bool
+
     class Config:
-        orm_mode=True
+        orm_mode = True
 
-class WaitRoomStatus(enum):
-    Waiting=1
-    LiveStart=2
-    Dissolution=3
 
-#def room_wait(room_id: int)->WaitRoomStatus,list[RoomUser]:
- #   return 
+class WaitRoomStatus(Enum):
+    Waiting = 1
+    LiveStart = 2
+    Dissolution = 3
+
+
+# def room_wait(room_id: int)->WaitRoomStatus,list[RoomUser]:
+#   return
