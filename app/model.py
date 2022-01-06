@@ -2,6 +2,7 @@ import json
 import uuid
 from enum import Enum, IntEnum
 from typing import Optional
+from app.api import RoomWaitResponse
 
 from fastapi import HTTPException
 from pydantic import BaseModel
@@ -175,5 +176,17 @@ class WaitRoomStatus(Enum):
     Dissolution = 3
 
 
-# def room_wait(room_id: int)->WaitRoomStatus,list[RoomUser]:
-#   return
+ def room_wait(room_id: int)->RoomWaitResponse:
+     room_wait_result: RoomWaitResponse
+     room_wait_result.response=1
+     with engine.begin() as conn:
+        result = conn.execute(
+            text("SELECT * FROM `room` WHERE room_id=:room"), dict(room_id=room_id)
+        )
+        try:
+            row = result.one()
+        except NoResultFound:
+            room_wait_result.status=3
+            return room_wait_result
+        row.
+   return 
