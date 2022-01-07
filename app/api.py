@@ -5,7 +5,14 @@ from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from . import model
-from .model import LiveDifficulty, RoomUser, SafeUser, WaitRoomStatus, get_user_by_token, room_wait_user
+from .model import (
+    LiveDifficulty,
+    RoomUser,
+    SafeUser,
+    WaitRoomStatus,
+    get_user_by_token,
+    room_wait_user,
+)
 
 app = FastAPI()
 
@@ -128,41 +135,50 @@ class RoomWaitResponse(BaseModel):
 
 @app.post("/room/wait", response_model=RoomWaitResponse)
 def room_wait(req: RoomWaitRequest):
-    #room_wait_result: RoomWaitResponse
-    status :int = model.room_wait_status(req.room_id)
-    room_user_list :list[RoomUser]= model.room_wait_user(req.room_id)
-    return RoomWaitResponse(
-        status=status, room_user_list=room_user_list
-    )
+    # room_wait_result: RoomWaitResponse
+    status: int = model.room_wait_status(req.room_id)
+    room_user_list: list[RoomUser] = model.room_wait_user(req.room_id)
+    return RoomWaitResponse(status=status, room_user_list=room_user_list)
+
 
 class RoomStartRequest(BaseModel):
-    room_id:int
+    room_id: int
+
 
 class RoomStartResponse(BaseModel):
     pass
-@app.post("/room/start",response_model=RoomStartResponse)
-def room_start(req:RoomStartRequest):
+
+
+@app.post("/room/start", response_model=RoomStartResponse)
+def room_start(req: RoomStartRequest):
     model.start_room(req.room_id)
     return RoomStartResponse
+
+
 class RoomEndRequest(BaseModel):
-    room_id:int
-    judge_count_list:list[int]
-    score:int
+    room_id: int
+    judge_count_list: list[int]
+    score: int
+
 
 class RoomEndResponse(BaseModel):
     pass
 
-@app.post("/room/end",response_model=RoomEndResponse)
-def room_end(req:RoomEndRequest,token=Depends(get_auth_token)):
-    user=get_user_by_token(token)
-    model.end_room(req.room_id,req.judge_count_list,req.score,user)
+
+@app.post("/room/end", response_model=RoomEndResponse)
+def room_end(req: RoomEndRequest, token=Depends(get_auth_token)):
+    user = get_user_by_token(token)
+    model.end_room(req.room_id, req.judge_count_list, req.score, user)
     return RoomEndResponse
+
+
 class RoomResultRequest(BaseModel):
-    room_id:int
+    room_id: int
+
 
 class RoomReultResponse(BaseModel):
-    result_user_list:list[ResultUser]
+    result_user_list: list[ResultUser]
+
 
 class RoomLeaveRequest(BaseModel):
-    room_id:int
- 
+    room_id: int
