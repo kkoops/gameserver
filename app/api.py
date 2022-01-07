@@ -149,13 +149,14 @@ class RoomEndRequest(BaseModel):
     judge_count_list:list[int]
     score:int
 
-class RommEndResponse(BaseModel):
+class RoomEndResponse(BaseModel):
     pass
 
-@app.post("/room/start",response_model=RoomStartResponse)
-def room_start(req:RoomStartRequest):
-    model.start_room(req.room_id)
-    return RoomStartResponse
+@app.post("/room/end",response_model=RoomEndResponse)
+def room_end(req:RoomEndRequest,token=Depends(get_auth_token)):
+    user=get_user_by_token(token)
+    model.end_room(req.room_id,req.judge_count_list,req.score,user)
+    return RoomEndResponse
 class RoomResultRequest(BaseModel):
     room_id:int
 

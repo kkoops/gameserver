@@ -213,3 +213,14 @@ def start_room(room_id: int) -> None:
             dict(room_id=room_id),
         )
     return None
+def end_room(room_id: int,judge_count_list:list[int],score:int,user:SafeUser)-> None:
+    with engine.begin() as conn:
+        uodate_result=conn.execute(
+            text("UPDATE `room` SET  `status`=`status`+1 WHERE `room_id`=:room_id"),
+            dict(room_id=room_id),
+        )
+        score_result=conn.execute(
+            text("UPDATE `room_user` SET  `score`=`score` WHERE `room_id`=:room_id AND`user_id=:user_id`"),
+            dict(socre=score,room_id=room_id,user_id=user.id),
+        )
+    return None
