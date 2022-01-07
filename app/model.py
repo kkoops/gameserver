@@ -219,14 +219,53 @@ def end_room(
     room_id: int, judge_count_list: list[int], score: int, user: SafeUser
 ) -> None:
     with engine.begin() as conn:
-        uodate_result = conn.execute(
+        update_result = conn.execute(
             text("UPDATE `room` SET  `status`=`status`+1 WHERE `room_id`=:room_id"),
             dict(room_id=room_id),
         )
         score_result = conn.execute(
             text(
-                "UPDATE `room_user` SET  `score`=`score` WHERE `room_id`=:room_id AND`user_id=:user_id`"
+                "UPDATE `room_user` SET  `score`=`score` WHERE `room_id`=:room_id AND`user_id`=:user_id"
             ),
             dict(socre=score, room_id=room_id, user_id=user.id),
+        )
+    return None
+
+
+class ResultUser:
+    user_id: int
+    judge_count_list: list[int]
+    score: int
+
+    class Config:
+        orm_mode = True
+
+
+def result_room(room_id: int) -> None:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text("SELECT * from `room_user`  WHERE `room_id`=:room_id"),
+            dict(room_id=room_id),
+        )
+        user_result_list = []
+        rows = result.all()
+        for row in rows:
+            user_result_list.append(ResultUser.orm_mode(row))
+    return user_result_list
+
+
+def leave_room(room_id: int, user: SafeUser) -> None:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text(
+                "DELETE FROM `room_user` WHERE `room_id=room_id` AND `user_id=user_id`"
+            ),
+            dict(room_id=room_id, user_id=user.id),
+        )
+        result = conn.execute(
+            text(
+                "UPDATE `room` SET  `joined_user_count`=`joined_user_count`-1 WHERE `room_id`=:room_id"
+            ),
+            dict(room_id=room_id),
         )
     return None

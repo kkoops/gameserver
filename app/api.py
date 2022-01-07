@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from . import model
 from .model import (
     LiveDifficulty,
+    ResultUser,
     RoomUser,
     SafeUser,
     WaitRoomStatus,
@@ -177,8 +178,25 @@ class RoomResultRequest(BaseModel):
 
 
 class RoomReultResponse(BaseModel):
-    result_user_list: list[ResultUser]
+    result_user_list: list[model.ResultUser]
+
+
+@app.post("/room/result", response_model=RoomReultResponse)
+def room_result(req: RoomResultRequest):
+    result_user_list: list[ResultUser] = model.result_room(req.room_id)
+    return RoomReultResponse(result_user_list=result_user_list)
 
 
 class RoomLeaveRequest(BaseModel):
     room_id: int
+
+
+class RoomLeaveResponse(BaseModel):
+    pass
+
+
+@app.post("/room/leave", respose_model=RoomLeaveResponse)
+def room_leave(req: RoomLeaveRequest, token=Depends(get_auth_token)):
+    user = get_user_by_token(token)
+    model.leave_room(req.room_id, user)
+    return RoomLeaveResponse

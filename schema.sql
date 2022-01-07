@@ -20,6 +20,11 @@ DROP TABLE IF EXISTS `room_user`;
 CREATE TABLE `room_user`(
   `room_id` bigint NOT NULL,
   `user_id` bigint NOT NULL,
+  `judge_perfect` int ,
+  `judge_good` int,
+  `judge_normal` int,
+  `judge_bad` int,
+  `judge_miss` int,
   `score` int,
   PRIMARY KEY(`room_id`,`user_id`)
 );
