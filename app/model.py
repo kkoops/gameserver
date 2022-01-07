@@ -204,3 +204,12 @@ def room_wait_user(room_id: int) -> list[RoomUser]:
             )
             list.append(RoomUser.from_orm(user_result.one()))
     return list
+
+
+def start_room(room_id: int) -> None:
+    with engine.begin() as conn:
+        result = conn.execute(
+            text("UPDATE `room` SET  `status`=`status`+1 WHERE `room_id`=:room_id"),
+            dict(room_id=room_id),
+        )
+    return None

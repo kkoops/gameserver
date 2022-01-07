@@ -5,7 +5,7 @@ from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel
 
 from . import model
-from .model import LiveDifficulty, RoomUser, SafeUser, WaitRoomStatus, get_user_by_token
+from .model import LiveDifficulty, RoomUser, SafeUser, WaitRoomStatus, get_user_by_token, room_wait_user
 
 app = FastAPI()
 
@@ -134,3 +134,34 @@ def room_wait(req: RoomWaitRequest):
     return RoomWaitResponse(
         status=status, room_user_list=room_user_list
     )
+
+class RoomStartRequest(BaseModel):
+    room_id:int
+
+class RoomStartResponse(BaseModel):
+    pass
+@app.post("/room/start",response_model=RoomStartResponse)
+def room_start(req:RoomStartRequest):
+    model.start_room(req.room_id)
+    return RoomStartResponse
+class RoomEndRequest(BaseModel):
+    room_id:int
+    judge_count_list:list[int]
+    score:int
+
+class RommEndResponse(BaseModel):
+    pass
+
+@app.post("/room/start",response_model=RoomStartResponse)
+def room_start(req:RoomStartRequest):
+    model.start_room(req.room_id)
+    return RoomStartResponse
+class RoomResultRequest(BaseModel):
+    room_id:int
+
+class RoomReultResponse(BaseModel):
+    result_user_list:list[ResultUser]
+
+class RoomLeaveRequest(BaseModel):
+    room_id:int
+ 
